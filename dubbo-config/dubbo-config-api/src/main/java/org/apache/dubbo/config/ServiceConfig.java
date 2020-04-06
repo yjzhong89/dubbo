@@ -190,6 +190,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             bootstrap.init();
         }
 
+        // 1. 检查以及更新配置
         checkAndUpdateSubConfigs();
 
         //init serviceMetadata
@@ -201,8 +202,10 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         serviceMetadata.setTarget(getRef());
 
         if (shouldDelay()) {
+            // 延时导出
             DELAY_EXPORT_EXECUTOR.schedule(this::doExport, getDelay(), TimeUnit.MILLISECONDS);
         } else {
+            // 直接导出
             doExport();
         }
 
@@ -283,7 +286,6 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         ConfigValidationUtils.validateServiceConfig(this);
         postProcessConfig();
     }
-
 
     protected synchronized void doExport() {
         if (unexported) {
@@ -464,6 +466,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                 if (CollectionUtils.isNotEmpty(registryURLs)) {
                     for (URL registryURL : registryURLs) {
                         //if protocol is only injvm ,not register
+                        // 本地协议不需要进行注册
                         if (LOCAL_PROTOCOL.equalsIgnoreCase(url.getProtocol())) {
                             continue;
                         }

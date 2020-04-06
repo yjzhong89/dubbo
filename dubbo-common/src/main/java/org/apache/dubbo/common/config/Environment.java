@@ -116,7 +116,7 @@ public class Environment extends LifecycleAdapter implements FrameworkExt {
         CompositeConfiguration prefixedConfiguration = new CompositeConfiguration(config.getPrefix(), config.getId());
         Configuration configuration = new ConfigConfigurationAdapter(config);
         if (this.isConfigCenterFirst()) {
-            // The sequence would be: SystemConfiguration -> AppExternalConfiguration -> ExternalConfiguration -> AbstractConfig -> PropertiesConfiguration
+            // The sequence would be: SystemConfiguration -> AppExternalConfiguration -> ExternalConfiguration -> AbstractConfig(bean初始化) -> PropertiesConfiguration
             // Config center has the highest priority
             prefixedConfiguration.addConfiguration(systemConfiguration);
             prefixedConfiguration.addConfiguration(environmentConfiguration);
@@ -149,10 +149,14 @@ public class Environment extends LifecycleAdapter implements FrameworkExt {
             if (dynamicConfiguration != null) {
                 globalConfiguration.addConfiguration(dynamicConfiguration);
             }
+            // 系统配置
             globalConfiguration.addConfiguration(systemConfiguration);
             globalConfiguration.addConfiguration(environmentConfiguration);
+            // 配置中心app
             globalConfiguration.addConfiguration(appExternalConfiguration);
+            // 配置中心全局
             globalConfiguration.addConfiguration(externalConfiguration);
+            // properties文件配置
             globalConfiguration.addConfiguration(propertiesConfiguration);
         }
         return globalConfiguration;
